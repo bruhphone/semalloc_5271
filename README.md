@@ -1,3 +1,6 @@
+# CSCI 5271 Fall '24 Project
+Extension to SeMalloc as part of a semester project. Currently our goal is to add path sensitivity support to SeMalloc.
+
 # SEMalloc:Semantics-Informed Memory Allocator
 
 ![semalloc](images/flow.png)
