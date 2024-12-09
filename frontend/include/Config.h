@@ -48,15 +48,18 @@ const map<string, uint16_t> HeapFunctionSizeParameterIndex = {
 
 #define SIZE_BIT 32
 #define MAX_SIZE ((1UL << SIZE_BIT) - 1)
-#define CSI_BIT 16
+#define CSI_BIT 13
 #define RH_BIT 14
 #define CSI_OFFSET SIZE_BIT
+#define PID_BIT 3
+#define PID_OFFSET 45
 
 #define LOOP_BIT         0x4000000000000000UL
 #define LOOP_BIT_REVERSE 0xBFFFFFFFFFFFFFFFUL
 #define HUGE_BIT         0x8000000000000000UL
 #define HUGE_BIT_REVERSE 0x7FFFFFFFFFFFFFFFUL
-#define CSI_MASK         0x0000FFFF00000000UL
+#define CSI_MASK         0x00001FFF00000000UL
+#define PID_MASK         0x0000E00000000000UL // pid mask
 
 const string CSTrackVariableName = "semallocCSTrack";
 const string CSSRecursiveStackName = "CSSRecursiveStack";
