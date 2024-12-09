@@ -466,6 +466,37 @@ void InstrumentIRPass::UpdateHMFInterface() {
             llvm::BasicBlock* elseBlock = llvm::BasicBlock::Create(BB->getContext(), "else", BB->getParent());
             llvm::BasicBlock* mergeBlock = BB->splitBasicBlock(CalledInstance->call_inst, "merge");
 
+            // NEW
+            auto* F = BB->getParent();
+            llvm::IRBuilder<> entryBuilder(&F->getEntryBlock(), F->getEntryBlock().begin());
+            llvm::AllocaInst* LocalPathVariable = entryBuilder.CreateAlloca(
+                llvm::Type::getInt64Ty(F->getContext()), nullptr, "LocalPathVariable");
+
+            // Initialize it to zero
+            entryBuilder.CreateStore(
+                llvm::ConstantInt::get(llvm::Type::getInt64Ty(F->getContext()), llvm::APInt(64, 0)),
+                LocalPathVariable);
+
+            for(auto& Block : F){
+                if(auto *branchInst = llvm::dyn_cast<llvm::BranchInst>(Block.getTerminator())){
+                    if(branchInst->isConditional() == true){
+                        llvm::IRBuilder<> p_builder(branchInst);
+
+                        llvm::Value* localVarValue = p_builder.CreateLoad(int64Type, LocalPathVariable, "localVarValue");
+                        llvm::Value* shiftedValue = p_builder.CreateLShr(localVarValue, llvm::ConstantInt::get(int64Type, 1), "shiftedValue");
+                        p_builder.CreateStore(shiftedValue, LocalPathVariable);
+
+                        llvm::BasicBlock* thenPath = branchInst->getSuccessor(0); // Branch taken (true)
+                        p_builder.setInsertPoint(thenPath);
+
+                        llvm::Value* thenLocalVarValue = p_builder.CreateLoad(int64Type, LocalPathVariable, "thenLocalVarValue");
+                        llvm::Value* msbMask = llvm::ConstantInt::get(int64Type, 1ULL << 63);
+                        llvm::Value* maskedValue = p_builder.CreateOr(thenLocalVarValue, msbMask, "maskedValue");
+                        p_builder.CreateStore(thenLocalVarValue, LocalPathVariable);
+                    }
+                }
+            }
+
             // condition branch
             auto* originalBR = &BB->back();
             originalBR->removeFromParent();
@@ -485,8 +516,15 @@ void InstrumentIRPass::UpdateHMFInterface() {
             auto* maskCSTV = builder.CreateAnd(lShrCSTV, llvm::ConstantInt::get(
                     llvm::Type::getInt64Ty(M->getContext()), llvm::APInt(64, CSI_MASK)), "mask_csi");
 
+            auto* loadPID = builder.CreateLoad(CSTrackVariable->getType()->getPointerElementType(),LocalPathVariable, "loadPID");
+            auto* lShlPID = builder.CreateShl(loadPID, llvm::ConstantInt::get(
+                    llvm::Type::getInt64Ty(M->getContext()), llvm::APInt(64, PID_OFFSET)), "lshlPID");
+            auto* maskPID = builder.CreateAnd(lShlPID, llvm::ConstantInt::get(
+                    llvm::Type::getInt64Ty(M->getContext()), llvm::APInt(64, PID_MASK)), "mask_pid");
+
             auto* addCSIInst = builder.CreateAdd(loadRH, maskCSTV);
-            auto* NewInst2 = builder.CreateAdd(addCSIInst, SizeParam, "br1_add_");
+            auto* markPathBits = builder.CreateOr(addCSIInst, maskPID, "mask_path");
+            auto* NewInst2 = builder.CreateAdd(markPathBits, SizeParam, "br1_add_");
 
             // possibly jump to the new block
             auto* loopCondition = builder.CreateICmpEQ(CSSLoopLayerTrack, llvm::ConstantInt::get(
