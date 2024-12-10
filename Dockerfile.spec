@@ -42,11 +42,11 @@ RUN mkdir -p /app/llvm15/build
 WORKDIR /app/llvm15/build
 RUN cmake -DLLVM_TARGET_ARCH="X86" -DLLVM_TARGETS_TO_BUILD="ARM;X86;AArch64" \
     -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=WebAssembly -DCMAKE_BUILD_TYPE=Release \
-    -DLLVM_ENABLE_PROJECTS="clang;openmp" -DLLVM_ENABLE_RTTI=ON -G "Unix Makefiles" ../llvm
+    -DLLVM_ENABLE_PROJECTS="clang;openmp" -DLLVM_ENABLE_RTTI=ON -G "Unix Makefiles" -DCLANG_ENABLE_OPAQUE_POINTERS=OFF ../llvm
 
 RUN make -j$(nproc)
-RUN cmake -DCMAKE_INSTALL_PREFIX=/app/llvm15/build -P cmake_install.cmake
-RUN cmake -DCMAKE_INSTALL_PREFIX=/app/llvm15/build -P /app/llvm15/build/projects/openmp/cmake_install.cmake
+RUN cmake -DCMAKE_INSTALL_PREFIX=/app/llvm15/build -P -DCLANG_ENABLE_OPAQUE_POINTERS=OFF cmake_install.cmake
+RUN cmake -DCMAKE_INSTALL_PREFIX=/app/llvm15/build -P -DCLANG_ENABLE_OPAQUE_POINTERS=OFF /app/llvm15/build/projects/openmp/cmake_install.cmake
 
 # wllvm
 RUN pip3 install wllvm
@@ -63,7 +63,7 @@ SHELL ["/bin/bash", "-ec"]
 RUN wget -O /app/spec.iso <<<<<<<<LINK>>>>>>>>
 RUN mkdir -p /app/spec
 WORKDIR /app/spec
-RUN cmake -E tar xf /app/spec.iso
+RUN cmake -E -DCLANG_ENABLE_OPAQUE_POINTERS=OFF tar xf /app/spec.iso
 RUN echo yes | /app/spec/install.sh
 
 # update spec
@@ -97,13 +97,13 @@ RUN /app/semalloc/benchmark/assets/spec_build_2.rb
 RUN mkdir -p /app/semalloc/frontend/build
 WORKDIR /app/semalloc/frontend/build
 
-RUN LLVM_DIR=/app/llvm15/build/lib/cmake/llvm cmake ..
+RUN LLVM_DIR=/app/llvm15/build/lib/cmake/llvm cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF ..
 RUN make -j6
 
 # build semalloc backend
 RUN mkdir -p /app/semalloc/backend/build
 WORKDIR /app/semalloc/backend/build
-RUN LLVM_DIR=/app/llvm15/build/lib/cmake/llvm cmake -DGLIBC_OVERRIDE=ON ..
+RUN LLVM_DIR=/app/llvm15/build/lib/cmake/llvm cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF -DGLIBC_OVERRIDE=ON ..
 RUN make -j6
 
 # clone memory allocators

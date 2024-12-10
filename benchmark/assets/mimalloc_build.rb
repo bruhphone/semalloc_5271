@@ -5,7 +5,15 @@ def extract_and_convert(global_prefix='/app/', mimalloc_test, build_cmd)
     test_dir = test_arr[0]
     test_name = test_arr[-1]
 
-    env = {"LLVM_COMPILER" => "clang", "LLVM_COMPILER_PATH" => "#{global_prefix}llvm15/build/bin/"}
+    env = {
+        "LLVM_COMPILER" => "clang",
+        "LLVM_COMPILER_PATH" => "#{global_prefix}llvm15/build/bin/",
+        "CC" => "wllvm",
+        "CXX" => "wllvm++",
+        "CFLAGS" => "-Xclang -no-opaque-pointers -Xclang -mno-constructor-aliases",
+        "CXXFLAGS" => "-Xclang -no-opaque-pointers -Xclang -mno-constructor-aliases"
+    }
+
     source_path = "#{global_prefix}mimalloc-bench/#{mimalloc_test}"
     css_path = "#{global_prefix}semalloc/"
 
