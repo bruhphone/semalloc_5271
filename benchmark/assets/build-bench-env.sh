@@ -473,7 +473,7 @@ if test "$setup_scudo" = "1"; then
   partial_checkout scudo $version_scudo https://github.com/llvm/llvm-project "compiler-rt/lib/scudo/standalone"
   cd "compiler-rt/lib/scudo/standalone"
   # TODO: make the next line prettier instead of hardcoding everything.
-  clang++ -flto -fuse-ld=lld -fPIC -std=c++14 -fno-exceptions $CXXFLAGS -fno-rtti -fvisibility=internal -msse4.2 -O3 -I include -shared -o libscudo$extso *.cpp -pthread
+  clang++ -Xclang -no-opaque-pointers -flto -fuse-ld=lld -fPIC -std=c++14 -fno-exceptions $CXXFLAGS -fno-rtti -fvisibility=internal -msse4.2 -O3 -I include -shared -o libscudo$extso *.cpp -pthread
   cd -
   popd
 fi
@@ -549,7 +549,7 @@ fi
 
 if test "$setup_tbb" = "1"; then
   checkout tbb $version_tbb https://github.com/oneapi-src/oneTBB
-  cmake -DCMAKE_BUILD_TYPE=Release -DTBB_BUILD=OFF -DTBB_TEST=OFF -DTBB_OUTPUT_DIR_BASE=bench .
+  cmake -DCMAKE_BUILD_TYPE=Release -DTBB_BUILD=OFF -DTBB_TEST=OFF -DCLANG_ENABLE_OPAQUE_POINTERS=OFF -DTBB_OUTPUT_DIR_BASE=bench .
   make -j $procs
   popd
 fi
@@ -648,14 +648,14 @@ fi
 
 if test "$setup_mesh" = "1"; then
   checkout mesh $version_mesh https://github.com/plasma-umass/mesh
-  cmake .
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF .
   make  # https://github.com/plasma-umass/Mesh/issues/96
   popd
 fi
 
 if test "$setup_nomesh" = "1"; then
   checkout nomesh $version_nomesh https://github.com/plasma-umass/mesh
-  cmake . -DDISABLE_MESHING=ON
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF . -DDISABLE_MESHING=ON
   make  # https://github.com/plasma-umass/Mesh/issues/96
   popd
 fi
@@ -682,20 +682,20 @@ if test "$setup_mi" = "1"; then
   echo ""
   echo "- build mimalloc release"
 
-  cmake -B out/release
-  cmake --build out/release --parallel $procs
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF -B out/release
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF --build out/release --parallel $procs
 
   echo ""
   echo "- build mimalloc debug with full checking"
 
-  cmake -B out/debug -DMI_CHECK_FULL=ON
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF -B out/debug -DMI_CHECK_FULL=ON
   cmake --build out/debug --parallel $procs
 
   echo ""
   echo "- build mimalloc secure"
 
-  cmake -B out/secure -DMI_SECURE=ON
-  cmake --build out/secure --parallel $procs
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF -B out/secure -DMI_SECURE=ON
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF --build out/secure --parallel $procs
   popd
 fi
 
@@ -705,20 +705,20 @@ if test "$setup_mi2" = "1"; then
   echo ""
   echo "- build mimalloc2 release"
 
-  cmake -B out/release
-  cmake --build out/release --parallel $procs
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF -B out/release
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF --build out/release --parallel $procs
 
   echo ""
   echo "- build mimalloc2 debug with full checking"
 
-  cmake -B out/debug -DMI_CHECK_FULL=ON
-  cmake --build out/debug --parallel $procs
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF -B out/debug -DMI_CHECK_FULL=ON
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF --build out/debug --parallel $procs
 
   echo ""
   echo "- build mimalloc2 secure"
 
-  cmake -B out/secure -DMI_SECURE=ON
-  cmake --build out/secure --parallel $procs
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF -B out/secure -DMI_SECURE=ON
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF --build out/secure --parallel $procs
   popd
 fi
 
@@ -817,8 +817,8 @@ if test "$setup_bench" = "1"; then
 
   phase "build benchmarks"
 
-  cmake -B out/bench -S bench
-  cmake --build out/bench --parallel $procs
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF -B out/bench -S bench
+  cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF --build out/bench --parallel $procs
 fi
 
 

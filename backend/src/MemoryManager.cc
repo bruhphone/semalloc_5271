@@ -35,7 +35,7 @@ void *MemoryManager::mallocMemory(size_t size) {
 #endif
     size_t CSI = (size & CSI_BIT_MASK) >> 32;
 #ifdef STAT
-    Error("CSI>>>>>>>> %zu", CSI);
+    // Error("CSI>>>>>>>> %zu", CSI); //commented out by Aidan, because it makes absolutely 0 sense
 #endif
     if ((size & CSI_LOOP_BIT_MASK) && (!tryPutToLazyPool(CSI))) {
         // in the loop, we need to find the corresponding BIBOP

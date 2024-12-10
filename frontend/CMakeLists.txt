@@ -4,7 +4,7 @@ project(KANALYZER)
 set(LT_LLVM_INSTALL_DIR "/data/ruizhe/llvm15/build")
 list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -fpic -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -fpic -g -DCLANG_ENABLE_OPAQUE_POINTERS=OFF")
 
 #message("${CMAKE_PREFIX_PATH}")
 #

@@ -3,7 +3,13 @@ def convert_spec(global_prefix='/app/', spec_test, build_cmd, exe_name)
     test_arr = spec_test.split('.')
     test_id = test_arr[0]
     
-    env = {"LLVM_COMPILER" => "clang", "LLVM_COMPILER_PATH" => "#{global_prefix}/llvm15/build/bin/"}
+    env = {"LLVM_COMPILER" => "clang", 
+        "LLVM_COMPILER_PATH" => "#{global_prefix}llvm15/build/bin/",
+        "CC" => "wllvm",
+        "CXX" => "wllvm++",
+        "CFLAGS" => "-Xclang -no-opaque-pointers -Xclang -mno-constructor-aliases",
+        "CXXFLAGS" => "-Xclang -no-opaque-pointers -Xclang -mno-constructor-aliases"
+    }
 
     puts "##################### Converting #{test_id} #####################"
     for exe in exe_name
