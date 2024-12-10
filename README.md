@@ -39,19 +39,21 @@ LD_PRELOAD=/PATH/TO/libsemalloc.so EXE_FILE.out
 ```
 
 For the test file in particular, all of these commands can be run at once with:
-'''
+```
 ./buildtest.rb
-'''
+```
 
 ## Making changes:
 This section is an aside for people who want to change SEMalloc.
 
 Compiling this whole program from scratch takes a long time.
 After you have compiled this program for the first time, you do not need to recompile the entire thing.
+
 Instead, you can compile a portion of it without reinstalling dependencies:
-'''
+```
 docker build -t semallocplus -f codechange.Dockerfile .
-'''
+```
+
 This will create a new docker image on top of the old one with any of your changes to SEMalloc compiled.
 (This method does not work if your changes include any changes to the Dockerfiles themselves)
 
