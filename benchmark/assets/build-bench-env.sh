@@ -749,7 +749,7 @@ if test "$setup_lean" = "1"; then
   mkdir -p out/release
   cd out/release
   env CC=wllvm CXX="wllvm++" cmake ../../src -DCUSTOM_ALLOCATORS=OFF -DLEAN_EXTRA_CXX_FLAGS="-w -Xclang -no-opaque-pointers -Xclang -mno-constructor-aliases"
-  echo "make -j$procs"
+  echo "make -j6"
   make -j $procs
   rm -rf ./tests/  # we don't need tests
   mkdir -p "$devdir/mathlib"

@@ -44,7 +44,7 @@ RUN cmake -DLLVM_TARGET_ARCH="X86" -DLLVM_TARGETS_TO_BUILD="ARM;X86;AArch64" \
     -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=WebAssembly -DCMAKE_BUILD_TYPE=Release \
     -DLLVM_ENABLE_PROJECTS="clang;openmp" -DLLVM_ENABLE_RTTI=ON -G "Unix Makefiles" -DCLANG_ENABLE_OPAQUE_POINTERS=OFF ../llvm
 
-RUN make -j$(nproc)
+RUN make -j6
 RUN cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF -DCMAKE_INSTALL_PREFIX=/app/llvm15/build -P cmake_install.cmake
 RUN cmake -DCLANG_ENABLE_OPAQUE_POINTERS=OFF -DCMAKE_INSTALL_PREFIX=/app/llvm15/build -P /app/llvm15/build/projects/openmp/cmake_install.cmake
 
